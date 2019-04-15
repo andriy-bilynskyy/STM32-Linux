@@ -9,34 +9,47 @@
 */
 
 #include <stm32f10x.h>
+#include "FreeRTOS.h"
+#include "task.h"
 
-void sleep_ms(unsigned int ms)
-{
-    while(ms--)
-    {
-        volatile unsigned int tmp = 5971u;
-        while(tmp--)
-        {
-            __asm("nop");
-        }
-    }
-}
-
-unsigned int delay_ms = 500;
-
-int main(void)
+void vTask1(void *pvParameters)
 {
     RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
 
     GPIOC->CRH &= ~(GPIO_CRH_MODE13 | GPIO_CRH_CNF13);
-    GPIOC->CRH |= GPIO_CRH_MODE13_1 | GPIO_CRH_CNF13_0;
+    GPIOC->CRH |= GPIO_CRH_MODE13_1 | GPIO_CRH_MODE13_0;
 
     for(;;)
-    {    
-        sleep_ms(delay_ms);
+    {
         GPIOC->BSRR = GPIO_BSRR_BS13;
-        
-        sleep_ms(delay_ms);
+        vTaskDelay(500);
         GPIOC->BRR = GPIO_BRR_BR13;
+        vTaskDelay(500);
     }
+    vTaskDelete(NULL);
+}
+
+void vTask2(void *pvParameters)
+{
+    RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
+
+    GPIOB->CRH &= ~(GPIO_CRH_MODE12 | GPIO_CRH_CNF12);
+    GPIOB->CRH |= GPIO_CRH_MODE12_1 | GPIO_CRH_MODE12_0;
+
+    for(;;)
+    {
+        GPIOB->BSRR = GPIO_BSRR_BS12;
+        vTaskDelay(100);
+        GPIOB->BRR = GPIO_BRR_BR12;
+        vTaskDelay(100);
+    }
+    vTaskDelete(NULL);
+}
+
+int main(void)
+{
+    (void)xTaskCreate(vTask1, "Task1", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+    (void)xTaskCreate(vTask2, "Task2", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+
+    vTaskStartScheduler();
 }

@@ -25,6 +25,12 @@ STM32_PERIPH_CSRC := \
 STM32_PERIPH_CXXSRC := \
   ${wildcard stm32-periph/*.cpp} \
 
+STM32_FREERTOS_CSRC := \
+  ${wildcard free-rtos/src/*.c} \
+
+STM32_FREERTOS_CXXSRC := \
+  ${wildcard freertos/src/*.cpp} \
+
 STM32_USER_CSRC := \
   ${wildcard src/*.c} \
 
@@ -34,13 +40,20 @@ STM32_USER_CXXSRC := \
 INCLUDE_PATH := \
   src \
   stm32-periph \
+  free-rtos/inc \
 
 LDLIBS := \
 
 LD_SCRIPT := linker/stm32_flash.ld
 
 
-OBJECTS := ${STM32_PERIPH_CSRC:.c=.o} ${STM32_PERIPH_CXXSRC:.cpp=.o} ${STM32_USER_CSRC:.c=.o} ${STM32_USER_CXXSRC:.cpp=.o}
+OBJECTS := \
+  ${STM32_PERIPH_CSRC:.c=.o} \
+  ${STM32_PERIPH_CXXSRC:.cpp=.o} \
+  ${STM32_FREERTOS_CSRC:.c=.o} \
+  ${STM32_FREERTOS_CXXSRC:.cpp=.o} \
+  ${STM32_USER_CSRC:.c=.o} \
+  ${STM32_USER_CXXSRC:.cpp=.o}
 
 CFLAGS  := -g -O3 
 CFLAGS  += -Wall -std=c99
