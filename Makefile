@@ -31,6 +31,12 @@ STM32_FREERTOS_CSRC := \
 STM32_FREERTOS_CXXSRC := \
   ${wildcard freertos/src/*.cpp} \
 
+SEGGER_RTT_CSRC := \
+  ${wildcard segger-rtt/*.c} \
+
+SEGGER_RTT_CXXSRC := \
+  ${wildcard segger-rtt/*.cpp} \
+
 STM32_USER_CSRC := \
   ${wildcard src/*.c} \
 
@@ -41,6 +47,7 @@ INCLUDE_PATH := \
   src \
   stm32-periph \
   free-rtos/inc \
+  segger-rtt \
 
 LDLIBS := \
 
@@ -52,6 +59,8 @@ OBJECTS := \
   ${STM32_PERIPH_CXXSRC:.cpp=.o} \
   ${STM32_FREERTOS_CSRC:.c=.o} \
   ${STM32_FREERTOS_CXXSRC:.cpp=.o} \
+  ${SEGGER_RTT_CSRC:.c=.o} \
+  ${SEGGER_RTT_CXXSRC:.cpp=.o} \
   ${STM32_USER_CSRC:.c=.o} \
   ${STM32_USER_CXXSRC:.cpp=.o}
 

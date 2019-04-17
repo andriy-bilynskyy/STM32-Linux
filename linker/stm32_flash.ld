@@ -41,6 +41,11 @@ SECTIONS
         *(.data_init)
     } > FLASH
 
+    .rtt : ALIGN(4)
+    {
+        KEEP(*(.rtt))
+    } > RAM
+
     .data : ALIGN(4)
     {
         _sdata = .;
