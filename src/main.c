@@ -9,8 +9,9 @@
 */
 
 #include <stm32f10x.h>
-#include "FreeRTOS.h"
-#include "task.h"
+#include <gpio_def.h>
+#include <FreeRTOS.h>
+#include <task.h>
 
 void vTask1(void *pvParameters)
 {
@@ -21,9 +22,7 @@ void vTask1(void *pvParameters)
 
     for(;;)
     {
-        GPIOC->BSRR = GPIO_BSRR_BS13;
-        vTaskDelay(500);
-        GPIOC->BRR = GPIO_BRR_BR13;
+        GPIOInvBit(GPIOC, 13);
         vTaskDelay(500);
     }
     vTaskDelete(NULL);
@@ -38,9 +37,7 @@ void vTask2(void *pvParameters)
 
     for(;;)
     {
-        GPIOB->BSRR = GPIO_BSRR_BS12;
-        vTaskDelay(100);
-        GPIOB->BRR = GPIO_BRR_BR12;
+        GPIOInvBit(GPIOB, 12);
         vTaskDelay(100);
     }
     vTaskDelete(NULL);
