@@ -16,6 +16,9 @@
 #define F_HSI_HZ 8000000u
 
 extern int main(void);
+#ifdef DEBUG
+extern void SEGGER_RTT_Init(void);
+#endif
 static bool HSE_ON = false;
 static void HSE_Fail(void);
 
@@ -32,6 +35,9 @@ void Reset_Handler(void)
 {
     memcpy(&_sdata, &_sidata, &_edata - &_sdata);
     memset(&_sbss, 0, &_ebss - &_sbss);
+#ifdef DEBUG
+    SEGGER_RTT_Init();
+#endif
     SystemInit();
     if(HSE_ON)
     {

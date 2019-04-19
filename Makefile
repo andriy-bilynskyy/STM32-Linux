@@ -48,34 +48,26 @@ INCLUDE_PATH := \
   config \
   stm32-periph \
   free-rtos/inc \
-  segger-rtt \
 
 LDLIBS := \
 
 LD_SCRIPT := linker/stm32_flash.ld
-
 
 OBJECTS := \
   ${STM32_PERIPH_CSRC:.c=.o} \
   ${STM32_PERIPH_CXXSRC:.cpp=.o} \
   ${STM32_FREERTOS_CSRC:.c=.o} \
   ${STM32_FREERTOS_CXXSRC:.cpp=.o} \
-  ${SEGGER_RTT_CSRC:.c=.o} \
-  ${SEGGER_RTT_CXXSRC:.cpp=.o} \
   ${STM32_USER_CSRC:.c=.o} \
   ${STM32_USER_CXXSRC:.cpp=.o}
 
-CFLAGS  := -g -O3 
-CFLAGS  += -Wall -std=c99
+CFLAGS  := -Wall -std=c99
 CFLAGS  += -mlittle-endian -mthumb -mcpu=cortex-m3
 CFLAGS  += -DSTM32F10X_MD
-CFLAGS  += ${addprefix -I, ${INCLUDE_PATH}}
 
-CXXFLAGS  := -g -O3 
-CXXFLAGS  += -Wall
+CXXFLAGS  := -Wall
 CXXFLAGS  += -mlittle-endian -mthumb -mcpu=cortex-m3
 CXXFLAGS  += -DSTM32F10X_MD
-CXXFLAGS  += ${addprefix -I, ${INCLUDE_PATH}}
 
 LDFLAGS := -T${LD_SCRIPT}
 LDFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m3
@@ -96,16 +88,39 @@ FLASHCOMMANDS := \
 
 FLASHOPTIONS := ${addprefix -f , ${FLASHCONFIGS}} ${FLASHCOMMANDS}
 
+ifndef BUILD
+  BUILD := DEBUG
+endif
+
+ifeq ($(BUILD),DEBUG)
+  DEBUG_OBJ := \
+    ${SEGGER_RTT_CSRC:.c=.o} \
+    ${SEGGER_RTT_CXXSRC:.cpp=.o} \
+
+  OBJECTS += $(DEBUG_OBJ)
+  INCLUDE_PATH += segger-rtt
+  CFLAGS  += -g3 -O0 -DDEBUG
+  CXXFLAGS += -g3 -O0 -DDEBUG
+else ifeq ($(BUILD),RELEASE)
+  DEBUG_OBJ := \
+
+  CFLAGS  += -g0 -O3
+  CXXFLAGS += -g0 -O3
+else
+  $(error Wrong BUILD '$(BUILD)'! Should be: DEBUG or RELEASE)
+endif
+
+CFLAGS  += ${addprefix -I, ${INCLUDE_PATH}}
+CXXFLAGS  += ${addprefix -I, ${INCLUDE_PATH}}
 
 .PHONY: all clean flash help
 
-all: ${PROJECT}.hex
-
-${PROJECT}.hex: ${PROJECT}.elf
-	${OBJCPY} -O ihex ${PROJECT}.elf ${PROJECT}.hex
+all: ${PROJECT}.elf
 
 ${PROJECT}.elf: ${OBJECTS}
+	$(info $(BUILD) BUILD)
 	${CC} ${OBJECTS} -o ${PROJECT}.elf ${LDFLAGS}
+	${OBJCPY} -O ihex ${PROJECT}.elf ${PROJECT}.hex
 	
 %.o: %.c
 	${CC} ${CFLAGS} -c $< -o $@
@@ -114,14 +129,18 @@ ${PROJECT}.elf: ${OBJECTS}
 	${CC} ${CXXFLAGS} -c $< -o $@
 
 clean:
-	rm -f ${OBJECTS} ${PROJECT}.elf ${PROJECT}.hex
+	rm -f ${OBJECTS} ${PROJECT}.elf ${PROJECT}.hex ${DEBUG_OBJ}
 
-flash: ${PROJECT}.hex
-	${FLASH} ${FLASHOPTIONS}
+flash:
+	@if [ -f "${PROJECT}.hex" ] ; then ${FLASH} ${FLASHOPTIONS}; else echo "Output .hex file doesn't exist. Run 'make all' before!"; fi
 
 help:
-	@echo "---------------------------------------------------------------------"
-	@echo "all   - create binary files (.elf, .hex)"
-	@echo "clean - remove generated files"	
-	@echo "flash - flash target"
-	@echo "---------------------------------------------------------------------"
+	$(info Help)
+	$(info ---------------------------------------------------------------------)
+	$(info make Help                     - this help text)
+	$(info make BUILD=<build_type> all   - create binary files (.elf, .hex))
+	$(info make clean                    - remove generated files)
+	$(info make flash                    - flash target)
+	$(info ---------------------------------------------------------------------)
+	$(info Available build_type [DEBUG RELEASE], eg: make BUILD=RELEASE ...)
+	$(info Default build_type DEBUG)

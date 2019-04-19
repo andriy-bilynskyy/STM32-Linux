@@ -10,13 +10,13 @@
 
 #include <stm32f10x.h>
 #include <gpio_def.h>
-#include <SEGGER_RTT.h>
+#include <common.h>
 #include <FreeRTOS.h>
 #include <task.h>
 
 void vTask1(void *pvParameters)
 {
-    SEGGER_RTT_printf(0, "Task 1 start\n");
+    DBG_PRINT("Task 1 start\n");
 
     RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
 
@@ -25,19 +25,19 @@ void vTask1(void *pvParameters)
 
     for(;;)
     {
-        SEGGER_RTT_printf(0, "Task 1\n");
+        DBG_PRINT("Task 1\n");
         GPIOInvBit(GPIOC, 13);
         vTaskDelay(500);
     }
 
-    SEGGER_RTT_printf(0, "Task 1 stop\n");
+    DBG_PRINT("Task 1 stop\n");
 
     vTaskDelete(NULL);
 }
 
 void vTask2(void *pvParameters)
 {
-    SEGGER_RTT_printf(0, "Task 2 start\n");
+    DBG_PRINT("Task 2 start\n");
 
     RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
 
@@ -46,21 +46,19 @@ void vTask2(void *pvParameters)
 
     for(;;)
     {
-        SEGGER_RTT_printf(0, "Task 2\n");
+        DBG_PRINT("Task 2\n");
         GPIOInvBit(GPIOB, 12);
         vTaskDelay(100);
     }
 
-    SEGGER_RTT_printf(0, "Task 2 stop\n");
+    DBG_PRINT("Task 2 stop\n");
 
     vTaskDelete(NULL);
 }
 
 int main(void)
 {
-    SEGGER_RTT_Init();
-
-    SEGGER_RTT_printf(0, "main start\n");
+    DBG_PRINT("main start\n");
     (void)xTaskCreate(vTask1, "Task1", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
     (void)xTaskCreate(vTask2, "Task2", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 
