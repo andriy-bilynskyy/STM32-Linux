@@ -45,6 +45,7 @@ STM32_USER_CXXSRC := \
 
 INCLUDE_PATH := \
   src \
+  config \
   stm32-periph \
   free-rtos/inc \
   segger-rtt \
