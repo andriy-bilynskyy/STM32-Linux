@@ -84,3 +84,11 @@ Start ddd
 Connect to gdb server (issue command in command window)
 
     target extended-remote :3333
+
+## Project SW components
+
+**Segger RTT** <br/>
+https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/
+
+**Free RTOS** <br/>
+https://www.freertos.org/
