@@ -20,8 +20,10 @@ extern "C" {
   #include <SEGGER_RTT.h>
   
   #define DBG_PRINT(fmt, ...)       SEGGER_RTT_printf(0, fmt, ##__VA_ARGS__)
+  #define DBG_INIT()                SEGGER_RTT_Init()
 #else
   #define DBG_PRINT(fmt, ...)
+  #define DBG_INIT()
 #endif
 
 #ifdef __cplusplus
