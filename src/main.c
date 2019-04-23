@@ -74,6 +74,8 @@ int main(void)
     DBG_INIT();
     DBG_OUT("main start");
 
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+
     (void)xTaskCreate(vTask1, "Task1", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
     (void)xTaskCreate(vTask2, "Task2", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
 
