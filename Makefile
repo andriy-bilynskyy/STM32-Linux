@@ -20,38 +20,12 @@ FLASH  := openocd
 PROJECT ?= stm32-test
 
 
-STM32_PERIPH_CSRC := \
+PROJECT_CSRC := \
   ${wildcard stm32-periph/*.c} \
-
-STM32_PERIPH_ASSRC := \
   ${wildcard stm32-periph/*.s} \
-
-STM32_PERIPH_CXXSRC := \
-  ${wildcard stm32-periph/*.cpp} \
-
-STM32_SPL_CSRC := \
   ${wildcard stm32-periph/spl/src/*.c} \
-
-STM32_SPL_CXXSRC := \
-  ${wildcard stm32-periph/spl/src/*.cpp} \
-
-STM32_FREERTOS_CSRC := \
   ${wildcard free-rtos/src/*.c} \
-
-STM32_FREERTOS_CXXSRC := \
-  ${wildcard freertos/src/*.cpp} \
-
-SEGGER_RTT_CSRC := \
-  ${wildcard segger-rtt/*.c} \
-
-SEGGER_RTT_CXXSRC := \
-  ${wildcard segger-rtt/*.cpp} \
-
-STM32_USER_CSRC := \
   ${wildcard src/*.c} \
-
-STM32_USER_CXXSRC := \
-  ${wildcard src/*.cpp} \
 
 INCLUDE_PATH := \
   src \
@@ -64,16 +38,7 @@ LDLIBS := \
 
 LD_SCRIPT := linker/stm32_flash.ld
 
-OBJECTS := \
-  ${STM32_PERIPH_CSRC:.c=.o} \
-  ${STM32_PERIPH_ASSRC:.s=.o} \
-  ${STM32_PERIPH_CXXSRC:.cpp=.o} \
-  ${STM32_SPL_CSRC:.c=.o} \
-  ${STM32_SPL_CXXSRC:.cpp=.o} \
-  ${STM32_FREERTOS_CSRC:.c=.o} \
-  ${STM32_FREERTOS_CXXSRC:.cpp=.o} \
-  ${STM32_USER_CSRC:.c=.o} \
-  ${STM32_USER_CXXSRC:.cpp=.o}
+OBJECTS := ${addsuffix .o, ${PROJECT_CSRC}}
 
 CFLAGS  := -Wall -std=c99
 CFLAGS  += -mlittle-endian -mthumb -mcpu=cortex-m3
@@ -111,18 +76,16 @@ ifndef BUILD
 endif
 
 ifeq ($(BUILD),DEBUG)
-  DEBUG_OBJ := \
-    ${SEGGER_RTT_CSRC:.c=.o} \
-    ${SEGGER_RTT_CXXSRC:.cpp=.o} \
-
-  OBJECTS += $(DEBUG_OBJ)
+  DEBUG_PROJECT_CSRC := \
+    ${wildcard segger-rtt/*.c} \
+  
   INCLUDE_PATH += segger-rtt
+
+  OBJECTS += ${addsuffix .o, ${DEBUG_PROJECT_CSRC}}
   CFLAGS  += -g3 -O0 -DDEBUG
   ASFLAGS += -g3 -O0 -DDEBUG
   CXXFLAGS += -g3 -O0 -DDEBUG
 else ifeq ($(BUILD),RELEASE)
-  DEBUG_OBJ := \
-
   CFLAGS  += -g0 -O3
   ASFLAGS += -g0 -O3
   CXXFLAGS += -g0 -O3
@@ -133,26 +96,28 @@ endif
 CFLAGS  += ${addprefix -I, ${INCLUDE_PATH}}
 CXXFLAGS  += ${addprefix -I, ${INCLUDE_PATH}}
 
-.PHONY: all clean flash help
+.PHONY: all build clean flash help
 
 all: ${PROJECT}.elf
 
+build: ${PROJECT}.elf
+
 ${PROJECT}.elf: ${OBJECTS}
 	$(info $(BUILD) BUILD)
-	${CC} ${OBJECTS} -o ${PROJECT}.elf ${LDFLAGS}
-	${OBJCPY} -O ihex ${PROJECT}.elf ${PROJECT}.hex
+	${CC} $^ -o $@ ${LDFLAGS}
+	${OBJCPY} -O ihex $@ ${PROJECT}.hex
 	
-%.o: %.c
-	${CC} ${CFLAGS} -c $< -o $@
+%.c.o: %.c
+	${CC} ${CFLAGS} -MD -c $< -o $@
 
-%.o: %.s
-	${CC} ${ASFLAGS} -c $< -o $@
+%.s.o: %.s
+	${CC} ${ASFLAGS} -MD -c $< -o $@
 
-%.o: %.cpp
-	${CC} ${CXXFLAGS} -c $< -o $@
+%.cpp.o: %.cpp
+	${CC} ${CXXFLAGS} -MD -c $< -o $@
 
 clean:
-	rm -f ${OBJECTS} ${PROJECT}.elf ${PROJECT}.hex ${DEBUG_OBJ}
+	rm -f ${OBJECTS} $(OBJECTS:.o=.d) ${PROJECT}.elf ${PROJECT}.hex
 
 flash:
 	@if [ -f "${PROJECT}.hex" ] ; then ${FLASH} ${FLASHOPTIONS}; else echo "Output .hex file doesn't exist. Run 'make all' before!"; fi
@@ -161,9 +126,12 @@ help:
 	$(info Help)
 	$(info ---------------------------------------------------------------------)
 	$(info make Help                     - this help text)
-	$(info make BUILD=<build_type> all   - create binary files (.elf, .hex))
+	$(info make BUILD=<build_type> build - create binary files (.elf, .hex))
+	$(info make BUILD=<build_type> all   - create binary files (.elf, .hex). same as build)
 	$(info make clean                    - remove generated files)
 	$(info make flash                    - flash target)
 	$(info ---------------------------------------------------------------------)
 	$(info Available build_type [DEBUG RELEASE], eg: make BUILD=RELEASE ...)
 	$(info Default build_type DEBUG)
+
+-include $(OBJECTS:.o=.d)
