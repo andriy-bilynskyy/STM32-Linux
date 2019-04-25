@@ -17,13 +17,15 @@ extern "C" {
 
 
 #ifdef DEBUG
-  #include <SEGGER_RTT.h>
+  #include <trace.h>
   
-  #define DBG_PRINT(fmt, ...)       SEGGER_RTT_printf(0, fmt, ##__VA_ARGS__)
-  #define DBG_INIT()                SEGGER_RTT_Init()
+  #define DBG_PRINT(lev, fmt, ...)       trace_printf(lev, fmt, ##__VA_ARGS__)
+  #define DBG_INIT()                     trace_init()
+  #define DBG_DEINIT()                   trace_deinit()
 #else
-  #define DBG_PRINT(fmt, ...)
+  #define DBG_PRINT(lev, fmt, ...)
   #define DBG_INIT()
+  #define DBG_DEINIT()
 #endif
 
 #ifdef __cplusplus

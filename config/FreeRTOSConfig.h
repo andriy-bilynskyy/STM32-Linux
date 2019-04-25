@@ -41,19 +41,27 @@
  *----------------------------------------------------------*/
 extern uint32_t SystemCoreClock;
 
-#define configUSE_PREEMPTION        1
-#define configUSE_IDLE_HOOK         0
-#define configUSE_TICK_HOOK         0
-#define configCPU_CLOCK_HZ          ((unsigned long)SystemCoreClock)
-#define configTICK_RATE_HZ          ((TickType_t)1000)
-#define configMAX_PRIORITIES        (8)
-#define configMINIMAL_STACK_SIZE    ((unsigned short)128)
-#define configTOTAL_HEAP_SIZE       ((size_t)(10 * 1024))
-#define configMAX_TASK_NAME_LEN     (16)
-#define configUSE_TRACE_FACILITY    0
-#define configUSE_16_BIT_TICKS      0
-#define configIDLE_SHOULD_YIELD     1
-#define configUSE_MUTEXES           1
+#define configUSE_PREEMPTION                        1
+#ifdef DEBUG
+    #define configUSE_IDLE_HOOK                     1
+    #define configGENERATE_RUN_TIME_STATS           1
+    #define configUSE_TRACE_FACILITY                1
+#else
+    #define configUSE_IDLE_HOOK                     0
+    #define configGENERATE_RUN_TIME_STATS           0
+    #define configUSE_TRACE_FACILITY                0
+#endif
+#define configUSE_TICK_HOOK                         0
+#define configCPU_CLOCK_HZ                          ((unsigned long)SystemCoreClock)
+#define configTICK_RATE_HZ                          ((TickType_t)1000)
+#define configMAX_PRIORITIES                        (8)
+#define configMINIMAL_STACK_SIZE                    ((unsigned short)256)
+#define configTOTAL_HEAP_SIZE                       ((size_t)(16 * 1024))
+#define configMAX_TASK_NAME_LEN                     (16)
+#define configUSE_16_BIT_TICKS                      0
+#define configIDLE_SHOULD_YIELD                     1
+#define configUSE_MUTEXES                           1
+#define configCHECK_FOR_STACK_OVERFLOW              1
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES           0
@@ -87,6 +95,14 @@ NVIC value of 255. */
 #define vPortSVCHandler     SVC_Handler
 #define xPortPendSVHandler  PendSV_Handler
 #define xPortSysTickHandler SysTick_Handler
+
+#ifdef DEBUG
+    extern void RtosStatTimerInit(void);
+    extern uint32_t RtosStatTimerGet(void);
+
+    #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS  RtosStatTimerInit
+    #define portGET_RUN_TIME_COUNTER_VALUE          RtosStatTimerGet
+#endif
 
 #endif /* FREERTOS_CONFIG_H */
 

@@ -78,8 +78,11 @@ endif
 ifeq ($(BUILD),DEBUG)
   DEBUG_PROJECT_CSRC := \
     ${wildcard segger-rtt/*.c} \
+    ${wildcard src/dbg-ext/*.c} \
   
-  INCLUDE_PATH += segger-rtt
+  INCLUDE_PATH += \
+    segger-rtt \
+    src/dbg-ext \
 
   OBJECTS += ${addsuffix .o, ${DEBUG_PROJECT_CSRC}}
   CFLAGS  += -g3 -O0 -DDEBUG
