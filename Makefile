@@ -14,6 +14,7 @@ CC     := ${TOOLCHAIN_PATH}/bin/arm-none-eabi-gcc
 CXX    := ${TOOLCHAIN_PATH}/bin/arm-none-eabi-g++
 AS     := ${TOOLCHAIN_PATH}/bin/arm-none-eabi-gcc
 OBJCPY := ${TOOLCHAIN_PATH}/bin/arm-none-eabi-objcopy
+SIZE   := ${TOOLCHAIN_PATH}/bin/arm-none-eabi-size
 FLASH  := openocd
 
 
@@ -85,9 +86,9 @@ ifeq ($(BUILD),DEBUG)
     src/dbg-ext \
 
   OBJECTS += ${addsuffix .o, ${DEBUG_PROJECT_CSRC}}
-  CFLAGS  += -g3 -O0 -DDEBUG
-  ASFLAGS += -g3 -O0 -DDEBUG
-  CXXFLAGS += -g3 -O0 -DDEBUG
+  CFLAGS  += -g3 -O1 -DDEBUG
+  ASFLAGS += -g3 -O1 -DDEBUG
+  CXXFLAGS += -g3 -O1 -DDEBUG
 else ifeq ($(BUILD),RELEASE)
   CFLAGS  += -g0 -O3
   ASFLAGS += -g0 -O3
@@ -109,6 +110,7 @@ ${PROJECT}.elf: ${OBJECTS}
 	$(info $(BUILD) BUILD)
 	${CC} $^ -o $@ ${LDFLAGS}
 	${OBJCPY} -O ihex $@ ${PROJECT}.hex
+	${SIZE} --format=berkeley $@
 	
 %.c.o: %.c
 	${CC} ${CFLAGS} -MD -c $< -o $@
