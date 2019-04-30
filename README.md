@@ -92,3 +92,39 @@ https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-t
 
 **Free RTOS** <br/>
 https://www.freertos.org/
+
+**STM32F10x standard peripheral library** <br/>
+https://www.st.com/content/st_com/en/products/embedded-software/mcu-mpu-embedded-software/stm32-embedded-software/stm32-standard-peripheral-libraries/stsw-stm32054.html
+
+## Quick start guide
+
+### Install tools
+
+    wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/8-2018q4/gcc-arm-none-eabi-8-2018-q4-major-linux.tar.bz2?revision=d830f9dd-cd4f-406d-8672-cca9210dd220?product=GNU%20Arm%20Embedded%20Toolchain,64-bit,,Linux,8-2018-q4-major
+    sudo tar xjC /opt/ -f 'gcc-arm-none-eabi-8-2018-q4-major-linux.tar.bz2?revision=d830f9dd-cd4f-406d-8672-cca9210dd220?product=GNU Arm Embedded Toolchain,64-bit,,Linux,8-2018-q4-major'
+
+    sudo apt-get install openocd make ddd
+
+    wget https://www.segger.com/downloads/flasher/JLink_Linux_x86_64.deb
+    sudo dpkg -i JLink_Linux_x86_64.deb
+    export LD_LIBRARY_PATH="/opt/SEGGER/JLink"
+
+*Note:* <br/>
+To persist LD_LIBRARY_PATH after reboot add the next lines to the end of your ~/.bashrc
+
+    if [ -d "/opt/SEGGER/JLink" ] ; then
+        export LD_LIBRARY_PATH="/opt/SEGGER/JLink"
+    fi
+
+### Obtain STM32 project template
+
+    git clone https://github.com/andriy-bilynskyy/STM32-Linux.git
+    cd cd STM32-Linux/
+
+### Build and flash
+
+    make build
+    make flash
+
+*Note:* <br/>
+Use make help to see all options: debug, console...

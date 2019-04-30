@@ -15,7 +15,7 @@ CXX    := ${TOOLCHAIN_PATH}/bin/arm-none-eabi-g++
 AS     := ${TOOLCHAIN_PATH}/bin/arm-none-eabi-gcc
 OBJCPY := ${TOOLCHAIN_PATH}/bin/arm-none-eabi-objcopy
 SIZE   := ${TOOLCHAIN_PATH}/bin/arm-none-eabi-size
-FLASH  := openocd
+GDB    := ${TOOLCHAIN_PATH}/bin/arm-none-eabi-gdb
 
 
 PROJECT ?= stm32-test
@@ -58,19 +58,6 @@ LDFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m3
 LDFLAGS += -Wl,--gc-sections
 LDFLAGS += ${addprefix -l, ${LDLIBS}}
 
-
-FLASHCONFIGS := \
-  openocd/jlink.cfg \
-  openocd/stm32f1x.cfg \
-
-FLASHCOMMANDS := \
-  -c "init" \
-  -c "reset init" \
-  -c "flash write_image erase $(PROJECT).hex" \
-  -c "reset" \
-  -c "shutdown" \
-
-FLASHOPTIONS := ${addprefix -f , ${FLASHCONFIGS}} ${FLASHCOMMANDS}
 
 ifndef BUILD
   BUILD := DEBUG
@@ -125,7 +112,38 @@ clean:
 	rm -f ${OBJECTS} $(OBJECTS:.o=.d) ${PROJECT}.elf ${PROJECT}.hex
 
 flash:
-	@if [ -f "${PROJECT}.hex" ] ; then ${FLASH} ${FLASHOPTIONS}; else echo "Output .hex file doesn't exist. Run 'make all' before!"; fi
+	@if [ -f "${PROJECT}.hex" ] ;                                                 \
+  then                                                                          \
+    openocd -f openocd/jlink.cfg -f openocd/stm32f1x.cfg                        \
+            -c "init" -c "reset init"                                           \
+            -c "flash write_image erase $(PROJECT).hex"                         \
+            -c "reset" -c "shutdown";                                           \
+  else                                                                          \
+    echo "Output .hex file doesn't exist. Run 'make all' before!";              \
+  fi
+
+erase:
+	openocd -f openocd/jlink.cfg -f openocd/stm32f1x.cfg                          \
+            -c "init" -c "reset init"                                           \
+            -c "flash probe 0" -c "flash protect 0 0 63 off"                    \
+            -c "reset halt" -c "stm32f1x mass_erase 0"                          \
+            -c "reset" -c "shutdown";                                           \
+
+debug:
+	@if [ -f "${PROJECT}.elf" ] ;                                                 \
+  then                                                                          \
+    openocd -f openocd/jlink.cfg -f openocd/stm32f1x.cfg &                      \
+    ddd "${PROJECT}.elf" --debugger "${GDB} -ex 'target extended-remote :3333'  \
+                                            -ex 'monitor reset halt'            \
+                                            -ex 'load'                          \
+                                            -ex 'monitor reset halt'";          \
+    kill $$!;                                                                   \
+  else                                                                          \
+    echo "Output .elf file doesn't exist. Run 'make all' before!";              \
+  fi
+
+console:
+	JLinkRTTViewer --device STM32F103C8 --rttaddr 0x20000000 --autoconnect
 
 help:
 	$(info Help)
@@ -135,6 +153,9 @@ help:
 	$(info make BUILD=<build_type> all   - create binary files (.elf, .hex). same as build)
 	$(info make clean                    - remove generated files)
 	$(info make flash                    - flash target)
+	$(info make erase                    - flash erase)
+	$(info make debug                    - start debugging session DDD(gdb))
+	$(info make console                  - start debugging console(traces, RTOS statistics...))
 	$(info ---------------------------------------------------------------------)
 	$(info Available build_type [DEBUG RELEASE], eg: make BUILD=RELEASE ...)
 	$(info Default build_type DEBUG)
