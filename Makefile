@@ -58,6 +58,7 @@ CXXFLAGS  += -DSTM32F10X_MD -DHSE_VALUE=8000000u -DUSE_STDPERIPH_DRIVER
 LDFLAGS := -T${LD_SCRIPT}
 LDFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m3
 LDFLAGS += -Wl,--gc-sections --specs=nosys.specs
+LDFLAGS += -Xlinker -Map=${PROJECT}.map
 LDFLAGS += ${addprefix -l, ${LDLIBS}}
 
 
@@ -111,7 +112,7 @@ ${PROJECT}.elf: ${OBJECTS}
 	${CXX} ${CXXFLAGS} -MD -c $< -o $@
 
 clean:
-	rm -f ${OBJECTS} $(OBJECTS:.o=.d) ${PROJECT}.elf ${PROJECT}.hex
+	rm -f ${OBJECTS} $(OBJECTS:.o=.d) ${PROJECT}.elf ${PROJECT}.hex ${PROJECT}.map
 
 flash:
 	@if [ -f "${PROJECT}.hex" ] ;                                                 \
