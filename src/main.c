@@ -68,6 +68,8 @@ void vTask2(void *pvParameters)
     vTaskDelete(NULL);
 }
 
+extern void vTask3(void *pvParameters);
+
 int main(void)
 {
     DBG_INIT();
@@ -77,6 +79,7 @@ int main(void)
 
     (void)xTaskCreate(vTask1, "Task1", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
     (void)xTaskCreate(vTask2, "Task2", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+    (void)xTaskCreate(vTask3, "Task3", configMINIMAL_STACK_SIZE, NULL, 2, NULL);
 
     vTaskStartScheduler();
 

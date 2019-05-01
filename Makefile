@@ -27,6 +27,7 @@ PROJECT_CSRC := \
   ${wildcard stm32-periph/spl/src/*.c} \
   ${wildcard free-rtos/src/*.c} \
   ${wildcard src/*.c} \
+  ${wildcard src/*.cpp} \
 
 INCLUDE_PATH := \
   src \
@@ -36,6 +37,7 @@ INCLUDE_PATH := \
   free-rtos/inc \
 
 LDLIBS := \
+  stdc++ \
 
 LD_SCRIPT := linker/stm32_flash.ld
 
@@ -49,13 +51,13 @@ ASFLAGS  := -Wall -std=c99
 ASFLAGS  += -mlittle-endian -mthumb -mcpu=cortex-m3
 ASFLAGS  += -DSTM32F10X_MD -DHSE_VALUE=8000000u -DUSE_STDPERIPH_DRIVER
 
-CXXFLAGS  := -Wall
+CXXFLAGS  := -Wall -fno-exceptions
 CXXFLAGS  += -mlittle-endian -mthumb -mcpu=cortex-m3
 CXXFLAGS  += -DSTM32F10X_MD -DHSE_VALUE=8000000u -DUSE_STDPERIPH_DRIVER
 
 LDFLAGS := -T${LD_SCRIPT}
 LDFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m3
-LDFLAGS += -Wl,--gc-sections
+LDFLAGS += -Wl,--gc-sections --specs=nosys.specs
 LDFLAGS += ${addprefix -l, ${LDLIBS}}
 
 
@@ -106,7 +108,7 @@ ${PROJECT}.elf: ${OBJECTS}
 	${CC} ${ASFLAGS} -MD -c $< -o $@
 
 %.cpp.o: %.cpp
-	${CC} ${CXXFLAGS} -MD -c $< -o $@
+	${CXX} ${CXXFLAGS} -MD -c $< -o $@
 
 clean:
 	rm -f ${OBJECTS} $(OBJECTS:.o=.d) ${PROJECT}.elf ${PROJECT}.hex
