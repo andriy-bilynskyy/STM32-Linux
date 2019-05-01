@@ -1,5 +1,9 @@
 # STM32 development under Linux
 
+## YouTube demo
+
+https://youtu.be/57-iolU-PpE
+
 ## Cheap startup hardware
 
 **USB JTAG Jlink clone** <br/>
