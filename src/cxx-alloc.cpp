@@ -3,7 +3,7 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
-#define DBG_OUT(lev, fmt, ...) DBG_PRINT(lev, " %s:%04u " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__)
+#define DBG_OUT(lev, fmt, ...) DBG_PRINT(lev, "%s:%04u " fmt, __FILE__, __LINE__, ##__VA_ARGS__)
 
 void* operator new  (size_t count )
 { 

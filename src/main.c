@@ -14,7 +14,7 @@
 #include <task.h>
 #include <stdbool.h>
 
-#define DBG_OUT(lev, fmt, ...) DBG_PRINT(lev, " %s:%04u " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__)
+#define DBG_OUT(lev, fmt, ...) DBG_PRINT(lev, "%s:%04u " fmt, __FILE__, __LINE__, ##__VA_ARGS__)
 
 void vTask1(void *pvParameters)
 {
@@ -37,7 +37,7 @@ void vTask1(void *pvParameters)
         vTaskDelay(500);
     }
 
-    DBG_OUT(LOG_DEBUG, "Task 1 stop\n");
+    DBG_OUT(LOG_DEBUG, "Task 1 stop");
 
     vTaskDelete(NULL);
 }
@@ -101,12 +101,12 @@ void vApplicationStackOverflowHook(xTaskHandle *pxTask, signed portCHAR *pcTaskN
     GPIO_Init(GPIOC, &GPIO_InitStruct);
     GPIO_ResetBits(GPIOC, GPIO_Pin_13);
 
-    DBG_PRINT(LOG_CRITICAL, "[STACK OVERFLOW] task: %s\n", pcTaskName);
+    DBG_PRINT(LOG_CRITICAL, "[STACK OVERFLOW] task: %s", pcTaskName);
 }
 
 void assert_failed(uint8_t* file, uint32_t line)
 {
-    DBG_PRINT(LOG_CRITICAL, "[ASSERT FAILED AT] %s:%04u\n", file, line);
+    DBG_PRINT(LOG_CRITICAL, "[ASSERT FAILED AT] %s:%04u", file, line);
     for(;;);
 }
 
@@ -121,7 +121,7 @@ void SysClockFailed(void)
     GPIO_Init(GPIOC, &GPIO_InitStruct);
     GPIO_ResetBits(GPIOC, GPIO_Pin_13);
 
-    DBG_PRINT(LOG_CRITICAL, "[SYSTEM CLOCK FAILED]\n");
+    DBG_PRINT(LOG_CRITICAL, "[SYSTEM CLOCK FAILED]");
     for(;;); 
 }
 
@@ -135,19 +135,19 @@ __attribute__((naked)) void HardFault_Handler(void)
         " mrsne r0, psp                 \n"
         " bl prvGetRegistersFromStack   \n"
     );
-    DBG_PRINT(LOG_CRITICAL, "[HARD FAULT]\n");
+    DBG_PRINT(LOG_CRITICAL, "[HARD FAULT]");
     for(;;);
 }
 
 void prvGetRegistersFromStack(unsigned int * pStack)
 {
-    DBG_PRINT(LOG_CRITICAL, "[CORE DUMP]\n");
-    DBG_PRINT(LOG_CRITICAL, "R0  = %08x\n", pStack[0]);
-    DBG_PRINT(LOG_CRITICAL, "R1  = %08x\n", pStack[1]);
-    DBG_PRINT(LOG_CRITICAL, "R2  = %08x\n", pStack[2]);
-    DBG_PRINT(LOG_CRITICAL, "R3  = %08x\n", pStack[3]);
-    DBG_PRINT(LOG_CRITICAL, "R12 = %08x\n", pStack[4]);
-    DBG_PRINT(LOG_CRITICAL, "LR  = %08x\n", pStack[5]);
-    DBG_PRINT(LOG_CRITICAL, "PC  = %08x\n", pStack[6]);
-    DBG_PRINT(LOG_CRITICAL, "PSR = %08x\n", pStack[7]);
+    DBG_PRINT(LOG_CRITICAL, "[CORE DUMP]");
+    DBG_PRINT(LOG_CRITICAL, "R0  = %08x", pStack[0]);
+    DBG_PRINT(LOG_CRITICAL, "R1  = %08x", pStack[1]);
+    DBG_PRINT(LOG_CRITICAL, "R2  = %08x", pStack[2]);
+    DBG_PRINT(LOG_CRITICAL, "R3  = %08x", pStack[3]);
+    DBG_PRINT(LOG_CRITICAL, "R12 = %08x", pStack[4]);
+    DBG_PRINT(LOG_CRITICAL, "LR  = %08x", pStack[5]);
+    DBG_PRINT(LOG_CRITICAL, "PC  = %08x", pStack[6]);
+    DBG_PRINT(LOG_CRITICAL, "PSR = %08x", pStack[7]);
 }

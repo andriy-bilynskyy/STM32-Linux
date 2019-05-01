@@ -36,6 +36,8 @@ typedef enum{
 void trace_init(void);
 void trace_deinit(void);
 void trace_printf(LOG_level_t level, const char * sFormat, ...);
+void trace_show_buf(LOG_level_t level, void * data, unsigned int size, const char *comment, ...);
+void trace_show_buflong(LOG_level_t level, void * data, unsigned int size, const char *comment, ...);
 void trace_set_level(LOG_level_t level);
 LOG_level_t trace_get_level(void);
 bool trace_set_level_str(const char * level);
