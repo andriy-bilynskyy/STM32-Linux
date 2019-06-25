@@ -28,6 +28,7 @@ PROJECT_CSRC := \
   ${wildcard free-rtos/src/*.c} \
   ${wildcard src/*.c} \
   ${wildcard src/*.cpp} \
+  ${wildcard tiny-printf/*.c} \
 
 INCLUDE_PATH := \
   src \
@@ -35,6 +36,7 @@ INCLUDE_PATH := \
   stm32-periph \
   stm32-periph/spl/inc \
   free-rtos/inc \
+  tiny-printf \
 
 LDLIBS := \
   stdc++ \

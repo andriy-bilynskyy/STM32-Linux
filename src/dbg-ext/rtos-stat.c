@@ -9,7 +9,7 @@
 */
 
 #include "rtos-stat.h"
-#include <SEGGER_RTT.h>
+#include <printf.h>
 #include <stm32f10x_conf.h>
 #include <FreeRTOS.h>
 #include <task.h>
@@ -24,33 +24,33 @@ void print_tasks_stat(void)
     {
         unsigned long run_time;
         task_cnt = uxTaskGetSystemState(tasks_stat, task_cnt, &run_time);
-        SEGGER_RTT_printf(0, "available %u task(s)\n", task_cnt);
+        printf("available %u task(s)\n", task_cnt);
         if(run_time && task_cnt)
         {
-            SEGGER_RTT_WriteString(0, "ID   State      P   PI  Time        Stack       %     Name\n");
+            printf("ID   State      P   PI  Time        Stack       %     Name\n");
             for(UBaseType_t i = 0; i < task_cnt; i++)
             {
                 static const char * task_states[] = {"Running  ", "Ready    ", "Blocked  ", "Suspended", "Deleted  ", "Invalid  "};
-                SEGGER_RTT_printf(0, "%-3u  ", tasks_stat[i].xTaskNumber);
                 UBaseType_t percentage = (unsigned long long)tasks_stat[i].ulRunTimeCounter * 1000 / run_time;
-                SEGGER_RTT_WriteString(0, task_states[tasks_stat[i].eCurrentState]);
-                SEGGER_RTT_printf(0, "  %-2u  %-2u  %-10u  %-10u  %2u.%1u  ", tasks_stat[i].uxBasePriority,
-                                                                              tasks_stat[i].uxCurrentPriority,
-                                                                              tasks_stat[i].ulRunTimeCounter,
-                                                                              tasks_stat[i].usStackHighWaterMark,
-                                                                              percentage/10, percentage%10);
-                SEGGER_RTT_WriteString(0, tasks_stat[i].pcTaskName);
-                SEGGER_RTT_PutChar(0, '\n');
+                printf("%-3u  %s  %-2u  %-2u  %-10u  %-10u  %2u.%1u  %s\n", 
+                                tasks_stat[i].xTaskNumber,
+                                task_states[tasks_stat[i].eCurrentState],
+                                tasks_stat[i].uxBasePriority,
+                                tasks_stat[i].uxCurrentPriority,
+                                tasks_stat[i].ulRunTimeCounter,
+                                tasks_stat[i].usStackHighWaterMark,
+                                percentage/10, percentage%10,
+                                tasks_stat[i].pcTaskName);
             }
         }
-        SEGGER_RTT_printf(0, "total time: %u sec\n", run_time / RTOS_STAT_TIMER_HZ);
+        printf("total time: %u sec\n", run_time / RTOS_STAT_TIMER_HZ);
         vPortFree(tasks_stat);
     }else{
-        SEGGER_RTT_printf(0, "available %u task(s)\n", task_cnt);
-        SEGGER_RTT_WriteString(0, "can't allocate memory for task stat.\n");
+        printf("available %u task(s)\n", task_cnt);
+        printf("can't allocate memory for task stat.\n");
     }
-    SEGGER_RTT_printf(0, "current free heap size: %u\nminimal free heap size: %u\n", xPortGetFreeHeapSize(),
-                                                                                     xPortGetMinimumEverFreeHeapSize());
+    printf(0, "current free heap size: %u\nminimal free heap size: %u\n", xPortGetFreeHeapSize(),
+                                                                          xPortGetMinimumEverFreeHeapSize());
 }
 
 void RtosStatTimerInit(void)
