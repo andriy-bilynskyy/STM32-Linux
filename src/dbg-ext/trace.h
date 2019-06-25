@@ -18,6 +18,8 @@
 extern "C" {
 #endif
 
+extern volatile bool trace_enable;
+
 #define FOREACH_DBGLEV(DBG_LEV) \
     DBG_LEV(LOG_INFO)           \
     DBG_LEV(LOG_DEBUG)          \

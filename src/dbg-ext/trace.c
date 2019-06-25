@@ -17,6 +17,8 @@
 #include <semphr.h>
 #include <SEGGER_RTT.h>
 
+volatile bool trace_enable = true;
+
 static volatile LOG_level_t trace_level = LOG_DEBUG;
 static bool trace_inited = false;
 static SemaphoreHandle_t xSemaphore = NULL;
@@ -62,7 +64,7 @@ void trace_printf(LOG_level_t level, const char * sFormat, ...)
     {
         level = LOG_CRITICAL;
     }
-    if(level >= trace_level && trace_inited)
+    if(trace_enable && level >= trace_level && trace_inited)
     {
         xSemaphoreTake(xSemaphore, portMAX_DELAY);
         (void)printf("[%08u] [%s] ", xTaskGetTickCount(), dbg_level_str[level] );
@@ -83,7 +85,7 @@ void trace_show_buf(LOG_level_t level, void * data, unsigned int size, const cha
         level = LOG_CRITICAL;
     }
 
-    if(level >= trace_level && trace_inited)
+    if(trace_enable && level >= trace_level && trace_inited)
     {
         xSemaphoreTake(xSemaphore, portMAX_DELAY);
         (void)printf("[%08u] [%s] ", xTaskGetTickCount(), dbg_level_str[level]);
@@ -110,7 +112,7 @@ void trace_show_buflong(LOG_level_t level, void * data, unsigned int size, const
 
     unsigned int lines = size / 0x10 + ((size % 0x10) ? 1 : 0);
 
-    if(level >= trace_level && trace_inited)
+    if(trace_enable && level >= trace_level && trace_inited)
     {
         xSemaphoreTake(xSemaphore, portMAX_DELAY);
         (void)printf("[%08u] [%s] ", xTaskGetTickCount(), dbg_level_str[level]);

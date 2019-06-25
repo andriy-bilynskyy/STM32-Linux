@@ -34,11 +34,18 @@ void vApplicationIdleHook(void)
         {"osstat", get_rtos_stat}
     };
 
+    static bool console_on = false;
     char cmd_buffer[CMD_MAX_LEN];
     unsigned int cmd_buf_ptr = 0;
 
     for(;;)
     {
+        if(!console_on)
+        {
+            (void)SEGGER_RTT_WaitKey();
+            trace_enable = false;
+            console_on = true;
+        }
         if(!cmd_buf_ptr)
         {
             printf(HELLO_CMD);
@@ -60,9 +67,14 @@ void vApplicationIdleHook(void)
             for(; cmd_buffer[i] && isspace(cmd_buffer[i]); i++);
             arg = &cmd_buffer[i];
 
-            if(!strcmp(cmd, "help"))
+            if(!strcmp(cmd, "exit"))
             {
-                printf("available commands:\n - help\n");
+                trace_enable = true;
+                console_on = false;
+            }
+            else if(!strcmp(cmd, "help"))
+            {
+                printf("available commands:\n - help\n - exit\n");
                 for(unsigned int i = 0; i < sizeof(cmd_data)/sizeof(cmd_data[0]); i++)
                 {
                     printf(" - %s\n", cmd_data[i].cmd);
