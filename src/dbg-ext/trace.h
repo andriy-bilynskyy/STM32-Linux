@@ -43,6 +43,7 @@ LOG_level_t trace_get_level(void);
 bool trace_set_level_str(const char * level);
 const char * trace_get_level_str();
 const char * trace_get_available_level_str(unsigned int index);
+void trace_crash(const char * sFormat, ...);
 
 #ifdef __cplusplus
 }

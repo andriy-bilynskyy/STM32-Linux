@@ -22,10 +22,12 @@ extern "C" {
   #define DBG_PRINT(lev, fmt, ...)       trace_printf(lev, fmt, ##__VA_ARGS__)
   #define DBG_INIT()                     trace_init()
   #define DBG_DEINIT()                   trace_deinit()
+  #define DBG_CRASH(fmt, ...)            trace_crash(fmt, ##__VA_ARGS__)
 #else
   #define DBG_PRINT(lev, fmt, ...)
   #define DBG_INIT()
   #define DBG_DEINIT()
+  #define DBG_CRASH(fmt, ...)
 #endif
 
 #ifdef __cplusplus

@@ -207,3 +207,14 @@ const char * trace_get_available_level_str(unsigned int index)
     }
     return result; 
 }
+
+void trace_crash(const char * sFormat, ...)
+{
+    va_list args;
+    va_start(args, sFormat);
+
+    (void)printf("********CRASH********\n");
+    (void)vprintf(sFormat, args);
+    (void)printf("*********************\n");
+    va_end(args);    
+}
