@@ -45,7 +45,7 @@ LD_SCRIPT := linker/stm32_flash.ld
 
 OBJECTS := ${addsuffix .o, ${PROJECT_CSRC}}
 
-CFLAGS  := -Wall -std=c99
+CFLAGS  := -Wall -std=c99 -fdata-sections -ffunction-sections
 CFLAGS  += -mlittle-endian -mthumb -mcpu=cortex-m3
 CFLAGS  += -DSTM32F10X_MD -DHSE_VALUE=8000000u -DUSE_STDPERIPH_DRIVER
 
@@ -53,7 +53,7 @@ ASFLAGS  := -Wall -std=c99
 ASFLAGS  += -mlittle-endian -mthumb -mcpu=cortex-m3
 ASFLAGS  += -DSTM32F10X_MD -DHSE_VALUE=8000000u -DUSE_STDPERIPH_DRIVER
 
-CXXFLAGS  := -Wall -fno-exceptions
+CXXFLAGS  := -Wall -fno-exceptions -fdata-sections -ffunction-sections
 CXXFLAGS  += -mlittle-endian -mthumb -mcpu=cortex-m3
 CXXFLAGS  += -DSTM32F10X_MD -DHSE_VALUE=8000000u -DUSE_STDPERIPH_DRIVER
 
