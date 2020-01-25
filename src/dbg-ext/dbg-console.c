@@ -54,17 +54,19 @@ void vApplicationIdleHook(void)
         SEGGER_RTT_PutChar(0, cmd_buffer[cmd_buf_ptr]);
         if(cmd_buffer[cmd_buf_ptr] == '\n')
         {
-            for(; cmd_buf_ptr && isspace(cmd_buffer[cmd_buf_ptr - 1]); cmd_buf_ptr--);
+            for(; cmd_buf_ptr &&
+                  isspace((unsigned char)cmd_buffer[cmd_buf_ptr - 1]);
+                  cmd_buf_ptr--);
             cmd_buffer[cmd_buf_ptr] = '\0';
 
             char *cmd = NULL, *arg = NULL;
             unsigned int i = 0;
-            for(; cmd_buffer[i] && isspace(cmd_buffer[i]); i++);
+            for(; cmd_buffer[i] && isspace((unsigned char)cmd_buffer[i]); i++);
             cmd = &cmd_buffer[i];
-            for(; cmd_buffer[i] && !isspace(cmd_buffer[i]); i++);
+            for(; cmd_buffer[i] && !isspace((unsigned char)cmd_buffer[i]); i++);
             cmd_buffer[i] = '\0';
             if( i < cmd_buf_ptr) i++;
-            for(; cmd_buffer[i] && isspace(cmd_buffer[i]); i++);
+            for(; cmd_buffer[i] && isspace((unsigned char)cmd_buffer[i]); i++);
             arg = &cmd_buffer[i];
 
             if(!strcmp(cmd, "exit"))
@@ -78,7 +80,7 @@ void vApplicationIdleHook(void)
                 for(unsigned int i = 0; i < sizeof(cmd_data)/sizeof(cmd_data[0]); i++)
                 {
                     printf(" - %s\n", cmd_data[i].cmd);
-                }   
+                }
             }else{
                 bool cmd_found = false;
                 for(unsigned int i = 0; !cmd_found && i < sizeof(cmd_data)/sizeof(cmd_data[0]); i++)
@@ -88,7 +90,7 @@ void vApplicationIdleHook(void)
                         cmd_data[i].fptr(arg);
                         cmd_found = true;
                     }
-                }   
+                }
                 if(!cmd_found)
                 {
                     printf("unknown command. use 'help' to list.\n");
@@ -137,5 +139,5 @@ static void get_rtos_stat(const char * type)
         print_tasks_stat();
     }else{
         printf("unknown argument. use 'help' to list.\n");
-    }  
+    }
 }

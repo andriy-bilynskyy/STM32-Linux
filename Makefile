@@ -7,7 +7,7 @@
 #****************************************************************************
 
 
-TOOLCHAIN_PATH := /opt/gcc-arm-none-eabi-8-2018-q4-major
+TOOLCHAIN_PATH := /opt/gcc-arm-none-eabi-9-2019-q4-major/
 
 
 CC     := ${TOOLCHAIN_PATH}/bin/arm-none-eabi-gcc
@@ -39,7 +39,7 @@ INCLUDE_PATH := \
   tiny-printf \
 
 LDLIBS := \
-  stdc++ \
+  stdc++_nano \
 
 LD_SCRIPT := linker/stm32_flash.ld
 
@@ -72,7 +72,7 @@ ifeq ($(BUILD),DEBUG)
   DEBUG_PROJECT_CSRC := \
     ${wildcard segger-rtt/*.c} \
     ${wildcard src/dbg-ext/*.c} \
-  
+
   INCLUDE_PATH += \
     segger-rtt \
     src/dbg-ext \
@@ -103,7 +103,7 @@ ${PROJECT}.elf: ${OBJECTS}
 	${CC} $^ -o $@ ${LDFLAGS}
 	${OBJCPY} -O ihex $@ ${PROJECT}.hex
 	${SIZE} --format=berkeley $@
-	
+
 %.c.o: %.c
 	${CC} ${CFLAGS} -MD -c $< -o $@
 

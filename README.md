@@ -19,7 +19,7 @@ https://wiki.stm32duino.com/index.php?title=Blue_Pill#Software_installation
 ## Flashing tools
 
 https://www.segger.com/downloads/flasher/ <br/>
-Select product for your operation system. In case of Ubuntu 64 bit use: 
+Select product for your operation system. In case of Ubuntu 64 bit use:
 J-Link Software and Documentation pack for Linux, DEB installer, 64-bit.
 To flash/erase use JFlashLiteExe.
 
@@ -88,6 +88,11 @@ Start ddd
 Connect to gdb server (issue command in command window)
 
     target extended-remote :3333
+
+## SEGGER's Real Time Transfer (RTT)
+It's JTAG console like semihosting but seems to be more fast and flexible.
+https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/
+Installation described in section **Flashing tools**
 
 ## Project SW components
 
