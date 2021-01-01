@@ -7,7 +7,7 @@
 #****************************************************************************
 
 
-TOOLCHAIN_PATH := /opt/gcc-arm-none-eabi-9-2019-q4-major/
+TOOLCHAIN_PATH := /opt/gcc-arm-none-eabi-10-2020-q4-major
 
 
 CC     := ${TOOLCHAIN_PATH}/bin/arm-none-eabi-gcc
@@ -120,29 +120,37 @@ flash:
 	@if [ -f "${PROJECT}.hex" ] ;                                                 \
   then                                                                          \
     openocd -f openocd/jlink.cfg -f openocd/stm32f1x.cfg                        \
-            -c "init" -c "reset init"                                           \
-            -c "flash write_image erase $(PROJECT).hex"                         \
-            -c "reset" -c "shutdown";                                           \
+            -c "init"                                                           \
+            -c "reset init"                                                     \
+            -c "flash write_image erase ${PROJECT}.hex"                         \
+            -c "reset"                                                          \
+            -c "shutdown";                                                      \
   else                                                                          \
     echo "Output .hex file doesn't exist. Run 'make all' before!";              \
   fi
 
 erase:
 	openocd -f openocd/jlink.cfg -f openocd/stm32f1x.cfg                          \
-            -c "init" -c "reset init"                                           \
-            -c "flash probe 0" -c "flash protect 0 0 63 off"                    \
-            -c "reset halt" -c "stm32f1x mass_erase 0"                          \
-            -c "reset" -c "shutdown";                                           \
+            -c "init"                                                           \
+            -c "reset init"                                                     \
+            -c "flash protect 0 0 last off"                                     \
+            -c "stm32f1x unlock 0"                                              \
+            -c "reset halt"                                                     \
+            -c "reset init"                                                     \
+            -c "stm32f1x mass_erase 0"                                          \
+            -c "reset"                                                          \
+            -c "shutdown";                                                      \
 
 debug:
 	@if [ -f "${PROJECT}.elf" ] ;                                                 \
   then                                                                          \
     openocd -f openocd/jlink.cfg -f openocd/stm32f1x.cfg &                      \
-    ddd "${PROJECT}.elf" --debugger "${GDB} -ex 'target extended-remote :3333'  \
+    ddd "${PROJECT}.elf" --debugger "${GDB}                                     \
+                                            -ex 'target extended-remote :3333'  \
                                             -ex 'monitor reset halt'            \
                                             -ex 'load'                          \
                                             -ex 'monitor reset halt'";          \
-    kill $$!;                                                                   \
+    kill -9 $$!;                                                                   \
   else                                                                          \
     echo "Output .elf file doesn't exist. Run 'make all' before!";              \
   fi
